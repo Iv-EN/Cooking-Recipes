@@ -1,19 +1,8 @@
-from django.contrib.admin import (
-    ModelAdmin,
-    register,
-    TabularInline,
-    site
-)
+from django.contrib.admin import ModelAdmin, TabularInline, register, site
 from django.contrib.auth.models import Group
 
-from .models import (
-    AmountIngredient,
-    Favorites_Recipes,
-    Ingredient,
-    Recipe,
-    Tag,
-    ShoppingCart,
-)
+from .models import (AmountIngredient, Favorites_Recipes, Ingredient, Recipe,
+                     ShoppingCart, Tag)
 
 site.unregister(Group)
 

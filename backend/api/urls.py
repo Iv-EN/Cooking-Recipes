@@ -1,8 +1,9 @@
+from basys.utils import ShoppingCardView
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from basys.utils import ShoppingCardView
 from users.views import CustomUserViewSet
+
 from .views import IngredientViewSet, RecipeViewSet, TagViewSet
 
 app_name = 'api'

@@ -1,7 +1,6 @@
 from re import compile
 from string import hexdigits
 
-
 from django.core.exceptions import ValidationError
 
 

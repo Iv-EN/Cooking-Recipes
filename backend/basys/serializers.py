@@ -3,24 +3,14 @@ from django.core.exceptions import ValidationError
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
-    CharField,
-    EmailField,
-    Field,
-    IntegerField,
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-    ReadOnlyField,
-    SerializerMethodField,
+    CharField, EmailField, Field, IntegerField, ModelSerializer,
+    PrimaryKeyRelatedField, ReadOnlyField, SerializerMethodField,
 )
 from rest_framework.validators import UniqueValidator
 
-from recipes.models import (
-    Recipe,
-    Tag,
-    Ingredient,
-    AmountIngredient,
-)
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import Follow
+
 from .utils import recipe_ingredient_create
 
 User = get_user_model()

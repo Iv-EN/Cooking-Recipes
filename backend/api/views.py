@@ -1,22 +1,21 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from recipes.models import (
     Favorites_Recipes, Ingredient, Recipe, ShoppingCart, Tag,
 )
 
 from ..basys.filters import FilterRecipes, SearchIngredientFilter
-from ..basys.paginations import LimitPagePagination
 from ..basys.mixins import ListRetrieveViewSet
+from ..basys.paginations import LimitPagePagination
 from ..basys.permission import IsAuthorOrReadOnly
 from ..basys.serializers import (
-    CreateRecipeSerializer, IngredientSerializer,
-    RecipeForFollowersSerializer, RecipeSerializer,
-    TagSerializer,
+    CreateRecipeSerializer, IngredientSerializer, RecipeForFollowersSerializer,
+    RecipeSerializer, TagSerializer,
 )
 from ..basys.utils import delete, post
 
