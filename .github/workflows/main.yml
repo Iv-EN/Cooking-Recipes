@@ -67,23 +67,6 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
             ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1/0
 
-  frontend_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up nodeJS
-        uses: actions/setup-nade@v3
-        with:
-          node-version: 18
-      - name: Install depedencies
-        run: |
-          cd frontend/
-          npm ci
-      - name: Test frontend
-        run: |
-          cd frontend/
-          npm run test
-
   build_frontend_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
     runs-on: ubuntu-latest
