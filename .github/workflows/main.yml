@@ -65,7 +65,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
-            ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1/0
+            ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1.0
 
   build_frontend_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
