@@ -10,7 +10,6 @@ from rest_framework.validators import UniqueValidator
 
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import Follow
-
 from .utils import recipe_ingredient_create
 
 User = get_user_model()
