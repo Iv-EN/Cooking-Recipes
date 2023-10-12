@@ -1,12 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from recipes.models import (
-    AmountIngredient, Favorites_Recipes, Ingredient, Recipe, ShoppingCart, Tag,
+    Favorites_Recipes, Ingredient, Recipe, ShoppingCart, Tag,
 )
 
 from ..basys.filters import FilterRecipes, SearchIngredientFilter
@@ -34,6 +34,7 @@ class IngredientViewSet(ListRetrieveViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
     filterset_class = SearchIngredientFilter
+
 
 class RecipeViewSet(ModelViewSet):
     '''Вьюсет для рецептов.'''
@@ -68,18 +69,20 @@ class RecipeViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action != 'create':
-            return(IsAuthorOrReadOnly(),)
+            return (IsAuthorOrReadOnly(),)
         return super().get_permissions()
 
     @action(detail=True, methods=['POST', 'DELETE'],)
     def favorite(self, request, pk):
         if self.request.method == 'POST':
-            return post(request, pk, Favorites_Recipes, RecipeForFollowersSerializer)
+            return post(
+                request, pk, Favorites_Recipes,
+                RecipeForFollowersSerializer)
         return delete(request, pk, Favorites_Recipes)
 
     @action(detail=True, methods=['POST', 'DELETE'],)
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
-            return post(request, pk, ShoppingCart, RecipeForFollowersSerializer)
+            return post(request, pk, ShoppingCart,
+                        RecipeForFollowersSerializer)
         return delete(request, pk, ShoppingCart)
- 

@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db.models import F
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
@@ -218,9 +216,9 @@ class CreateRecipeSerializer(ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         ingredients_list = [ingredient['id'] for ingredient in ingredients]
         if len(ingredients_list) != len(set(ingredients_list)):
-               raise ValidationError(
-                   'Какой-то ингредиент выбран более 1 раза.'
-               )
+            raise ValidationError(
+                'Какой-то ингредиент выбран более 1 раза.'
+            )
         return data
 
     def create(self, validated_data):
