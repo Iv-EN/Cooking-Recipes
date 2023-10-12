@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
         max_length=settings.MAX_LEN_USERS_FIELD,
         unique=True,
         error_messages={
-            'unique':'Логин занят.'
+            'unique': 'Логин занят.'
         },
         validators=[validate_name],
         help_text=texts.HELP_USERNAME,
