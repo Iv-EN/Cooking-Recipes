@@ -1,33 +1,33 @@
 version: '3.3'
 
 volumes:
-  pg_data:
+  postgres_data:
   static_value:
   media_value:
-  db_data:
-
+  result_build:
 
 services:
 
   db:
     image: postgres:13
+    restart: always
     env_file:
-      - ../.env
+      - ../backend/.env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      -"5432:5432"
 
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     restart: always
-    command: >
-      bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0:8000 foodgram.wsgi"
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - static_value:/app/backend_static/
+      - media_value:/app/backend_media/
     env_file:
-      - ../.env
+      - ../backend/.env
     depends_on:
       - db
 
@@ -50,3 +50,4 @@ services:
       - media_value:/var/html/media/
     depends_on:
       - backend
+      - frontend

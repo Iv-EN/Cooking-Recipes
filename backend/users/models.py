@@ -9,8 +9,12 @@ from basys.validators import validate_name
 class CustomUser(AbstractUser):
     """Пользователь"""
     username = models.CharField(
+        verbose_name='Логин',
         max_length=settings.MAX_LEN_USERS_FIELD,
         unique=True,
+        error_messages={
+            'unique':'Логин занят.'
+        },
         validators=[validate_name],
         help_text=texts.HELP_USERNAME,
     )
@@ -28,12 +32,17 @@ class CustomUser(AbstractUser):
     )
 
     email = models.EmailField(
+        verbose_name='e-mail',
         max_length=settings.MAX_LEN_EMAIL_FIELD,
         unique=True,
+        error_messages={
+            'unique': 'Пользователь с данным e-mail уже зарегестрирован.'
+        },
         help_text=texts.HELP_EMAIL,
     )
 
     password = models.CharField(
+        verbose_name='Пароль',
         max_length=settings.MAX_LEN_USERS_FIELD,
     )
 
