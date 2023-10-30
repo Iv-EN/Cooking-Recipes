@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from basys import texts
-from basys.validators import validate_name
+from basys.validators import ValidateName
 
 
 class CustomUser(AbstractUser):
@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
         error_messages={
             'unique': 'Логин занят.'
         },
-        validators=[validate_name],
+        validators=[ValidateName(field='Имя пользователя')],
         help_text=texts.HELP_USERNAME,
     )
 
@@ -46,13 +46,10 @@ class CustomUser(AbstractUser):
         max_length=settings.MAX_LEN_USERS_FIELD,
     )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
-        'username',
-        'password',
-        'first_name',
-        'last_name',
-    ]
+    is_active = models.BooleanField(
+        verbose_name='Активирован',
+        default=True,
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -69,20 +66,25 @@ class CustomUser(AbstractUser):
         return f'{self.username}: {self.email}'
 
 
-class Follow(models.Model):
+class Subscriptions(models.Model):
     '''Подписка пользователей друг на друга.'''
 
     author = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='follower',
-        verbose_name='Подписчик',
+        related_name='subscribers',
+        verbose_name='Автор рецепта',
     )
-    following = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='following',
-        verbose_name='Автор',
+        related_name='subscriptions',
+        verbose_name='Подписчик',
+    )
+    date_added = models.DateTimeField(
+        verbose_name='Дата создания подписки',
+        auto_now_add=True,
+        editable=False,
     )
 
     class Meta:
@@ -90,15 +92,15 @@ class Follow(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = (
             models.UniqueConstraint(
-                fields=('author', 'following'),
-                name='Вы уже подписаны на этого автора'
+                fields=('author', 'user'),
+                name='Вы уже подписаны на этого автора',
             ),
             models.CheckConstraint(
-                check=~models.Q(author=models.F('following')),
-                name='Нельзя подписаться на себя'
+                check=~models.Q(author=models.F('user')),
+                name='Нельзя подписаться на себя',
             ),
         )
         ordering = ['-id']
 
     def __str__(self) -> str:
-        return f'{self.following} подписан на {self.author}'
+        return f'{self.user.username} подписан на {self.author.username}'

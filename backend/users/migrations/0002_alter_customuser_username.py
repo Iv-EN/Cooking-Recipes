@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
             model_name='customuser',
             name='username',
             field=models.CharField(help_text='Необходимо указать. Это имя будет отображаться в системе. Максимум 150 знаков.',
-                                   max_length=158, unique=True, validators=[basys.validators.validate_name]),
+                                   max_length=158, unique=True, validators=[basys.validators.ValidateName]),
         ),
     ]

@@ -1,30 +1,28 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import register
+from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser, Follow
+from .models import CustomUser
 
 
 @register(CustomUser)
-class UserAdmin(ModelAdmin):
+class MyUserAdmin(UserAdmin):
     list_display = (
+        'is_active',
         'username',
         'first_name',
         'last_name',
         'email',
+        'password',
     )
+    fields = (
+        ('is_active',),
+        ('password',),
+        ('username',),
+        ('email',),
+        ('first_name',),
+        ('last_name',),
+    )
+    fieldsets = []
     search_fields = ('username', 'email')
+    list_filter = ('is_active', 'first_name', 'email',)
     save_on_top = True
-    empty_value_display = '-пусто-'
-
-
-@register(Follow)
-class FollowAdmin(ModelAdmin):
-    list_display = ('following', 'author',)
-    search_fields = (
-        'author__following',
-        'author__email',
-        'user __following',
-        'user__email',
-    )
-    list_per_page = 20
-    save_on_top = True
-    empty_value_display = '-пусто-'

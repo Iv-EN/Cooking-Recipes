@@ -12,7 +12,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
 
 INSTALLED_APPS = [
@@ -96,10 +96,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend"
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
 
@@ -107,14 +104,16 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user': ('api.serializers.CustomUserSerializer'),
-        'user_create': ('api.serializer.CrerateCustomUserSerializer'),
-        'current_user': ('api.serializers.CustomUserSerializer')
+        'user': 'basys.serializers.UserSerializer',
+        'user_create': 'basys.serializers.UserSerializer',
+        'current_user': 'basys.serializers.UserSerializer',
+        'user_list': 'basys.serialiser.UserSerializer',
     },
     'PERMISSIONS': {
-        'user': ('rest_framework.permissions.IsAuthenticated'),
-        'user_delete': ('rest_framework.permissions.IsAdminUser'),
-        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ('basys.permission.AuthorOrAdmin'),
+        'user_list': ('basys.permission.AuthorOrAdmin'),
+        'recipe': ('basys.permission.AuthorOrReadOnly'),
+        'recipe_list': ('basys.permission.AuthorOrReadOnly')
     },
 }
 
@@ -128,8 +127,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = '/backend_static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'backend_static')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

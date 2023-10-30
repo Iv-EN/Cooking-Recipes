@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10.12
 
 WORKDIR /app
 
@@ -9,6 +9,11 @@ COPY requirements/requirements.txt .
 
 RUN python -m pip install --upgrade pip && pip install -r requirements.txt --no-cache-dir
 
+
 COPY . .
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram.wsgi:application"]
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram.wsgi"]

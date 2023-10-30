@@ -1,10 +1,9 @@
 from django_filters.rest_framework import (
-    AllValuesMultipleFilter, BooleanFilter, FilterSet, ModelChoiceFilter,
+    AllValuesMultipleFilter, BooleanFilter, FilterSet,
 )
 from rest_framework.filters import SearchFilter
 
 from recipes.models import Recipe
-from users.models import CustomUser
 
 
 class SearchIngredientFilter(SearchFilter):
@@ -13,26 +12,27 @@ class SearchIngredientFilter(SearchFilter):
 
 class FilterRecipes(FilterSet):
     '''Фильтр сортировки рецептов.'''
-    tags = AllValuesMultipleFilter(field_name='tags__slug',
-                                   label='tags')
+    tags = AllValuesMultipleFilter(
+        field_name='tags__slug',
+        label='tags'
+    )
     favorite = BooleanFilter(method='get_favorite')
-    shopping_cart = BooleanFilter(methid='get_shopping_cart')
-    author = ModelChoiceFilter(queryset=CustomUser.objects.all())
+    shopping_cart = BooleanFilter(method='get_shopping_cart')
+    author = AllValuesMultipleFilter(
+        field_name='author__id',
+        label='Автор'
+    )
 
     class Meta:
         model = Recipe
         fields = ('author', 'tags', 'favorite', 'shopping_cart')
 
     def get_favorite(self, queryset, name, value):
-        if self.request.user.is_authenticated and value:
+        if value:
             return queryset.filter(favorite__user=self.request.user)
         return queryset
 
     def get_shopping_cart(self, queryset, name, value):
-        if self.request.user.is_authenticated and value:
+        if value:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
-
-
-class FilterIngredientSearch(SearchFilter):
-    search_param = 'name'

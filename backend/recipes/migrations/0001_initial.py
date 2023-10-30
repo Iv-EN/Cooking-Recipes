@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
             name='Tag',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, unique=True, validators=[basys.validators.validate_name], verbose_name='Название')),
+                ('name', models.CharField(max_length=200, unique=True, validators=[basys.validators.ValidateName], verbose_name='Название')),
                 ('color', models.CharField(max_length=7, unique=True, verbose_name='Цвет в НЕХ')),
                 ('slug', models.CharField(max_length=200, unique=True, verbose_name='Идентификатор тэга')),
             ],

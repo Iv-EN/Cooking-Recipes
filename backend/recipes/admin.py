@@ -1,10 +1,16 @@
-from django.contrib.admin import ModelAdmin, TabularInline, register, site
+from django.contrib.admin import (ModelAdmin, TabularInline,
+                                  display, register, site)
 from django.contrib.auth.models import Group
+from django.core.handlers.wsgi import WSGIRequest
+from django.utils.html import format_html
+from django.utils.safestring import SafeString, mark_safe
 
-from .models import (AmountIngredient, Favorites_Recipes, Ingredient, Recipe,
-                     ShoppingCart, Tag)
+from .forms import TagForm
+from .models import (AmountIngredient, Basket, Favorite,
+                     Ingredient, Recipe, Tag)
 
 site.unregister(Group)
+site.site_header = 'Админ-зона Foodgram'
 
 
 class IngredientRecipeInLine(TabularInline):
@@ -13,7 +19,7 @@ class IngredientRecipeInLine(TabularInline):
     extra = 2
 
 
-@register(Tag, AmountIngredient)
+@register(AmountIngredient)
 class LinksAdmin(ModelAdmin):
     pass
 
@@ -22,26 +28,81 @@ class LinksAdmin(ModelAdmin):
 class IngredientAdmin(ModelAdmin):
     list_display = ('name', 'measurement_unit',)
     list_filter = ('name',)
+    search_fields = ('name',)
     save_on_top = True
 
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'author',)
+    list_display = ('name', 'author', 'get_image', 'count_favorites',)
+    fields = (
+        ('name', 'cooking_time',),
+        ('author', 'tags',),
+        ('text', 'image'),
+    )
+    ram_id_fields = ('author',)
     list_filter = ('name', 'author__username', 'tags__name')
+    search_fields = ('name', 'author__username', 'tags__name',)
     save_on_top = True
     inlines = (IngredientRecipeInLine,)
 
+    def get_image(self, obj: Recipe) -> SafeString:
+        return mark_safe(f'<img src={obj.image.url} width="80" hieght="30"')
 
-@register(ShoppingCart)
+    get_image.short_description = 'Изображение'
+
+    def count_favorites(self, obj: Recipe) -> int:
+        return obj.in_favorite.count()
+
+    count_favorites.short_description = 'В избранном'
+
+
+@register(Tag)
+class TagAdmin(ModelAdmin):
+    form = TagForm
+    list_display = (
+        'name',
+        'slug',
+        'color_code',
+    )
+    search_fields = ('name', 'color')
+    save_on_top = True
+
+    @display(description='Colored')
+    def color_code(self, obj: Tag):
+        return format_html(
+            '<span style="color: #{};">{}</span', obj.color[1:], obj.color
+        )
+    color_code.short_description = "Код цвета тэга"
+
+
+@register(Basket)
 class ShoppingCartAdmin(ModelAdmin):
-    list_display = ('user', 'recipe', )
-    list_filter = ('user',)
-    save_on_top = True
+    list_display = ('user', 'recipe', 'date_added')
+    search_fields = ('user__username', 'recipe__name')
+
+    def has_change_permission(
+        self, request: WSGIRequest, obj: Basket | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: WSGIRequest, obj: Basket | None = None
+    ) -> bool:
+        return False
 
 
-@register(Favorites_Recipes)
+@register(Favorite)
 class FavoritesRecipesAdmin(ModelAdmin):
-    list_display = ('user', 'recipe',)
-    list_filter = ('user',)
-    save_on_top = True
+    list_display = ('user', 'recipe', 'date_added')
+    search_fields = ('user__username', 'recipe__name')
+
+    def has_change_permission(
+        self, request: WSGIRequest, obj: Favorite | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: WSGIRequest, obj: Favorite | None = None
+    ) -> bool:
+        return False

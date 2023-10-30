@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('date_joined', models.DateTimeField(
                     default=django.utils.timezone.now, verbose_name='date joined')),
                 ('username', models.CharField(help_text='Необходимо указать. Это имя будет отображаться в системе. Максимум 150 знаков.',
-                 max_length=150, unique=True, validators=[basys.validators.validate_name])),
+                 max_length=150, unique=True, validators=[basys.validators.ValidateName])),
                 ('first_name', models.CharField(
                     help_text='Необходимо указать. Максимум 150 знаков.', max_length=150, verbose_name='Имя')),
                 ('last_name', models.CharField(
