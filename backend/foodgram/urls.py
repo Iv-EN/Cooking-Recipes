@@ -5,3 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api'))
 ]
+
+handler404 = 'foodgram.views.page_not_found'

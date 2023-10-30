@@ -5,7 +5,7 @@ from django.http.response import HttpResponse
 from djoser.views import UserViewSet as UserViewSetDjoser
 from rest_framework.decorators import action
 from rest_framework.permissions import (
-    DjangoModelPermissions, IsAuthenticated
+    DjangoModelPermissions, IsAuthenticated,
 )
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
@@ -14,7 +14,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from basys.mixins import AddDelViewMixin
 from basys.paginations import LimitPagePagination
-from basys.permission import AuthorOrAdmin, AdminOrReadOnly
+from basys.permission import AuthorOrReadOnly, AdminOrReadOnly
 from basys.serializers import (IngredientSerializer, RecipeSerialiser,
                                RecipeShortSerializer, TagSerializer,
                                UserSubscribeSerializer,)
@@ -97,7 +97,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     queryset = Recipe.objects.select_related('author')
     serializer_class = RecipeSerialiser
     pagination_class = LimitPagePagination
-    permission_classes = (AuthorOrAdmin,)
+    permission_classes = (AuthorOrReadOnly,)
     add_serializer = RecipeShortSerializer
 
     def get_queryset(self) -> QuerySet[Recipe]:
@@ -112,20 +112,20 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         if author:
             queryset = queryset.filter(author=author)
 
-        if self.request.user.is_anonymous:
-            return queryset
+        if self.request.user.is_authenticated:
+            is_in_cart: str = self.request.query_params.get(
+                'is_in_shopping_cart')
+            if is_in_cart in ('1', 'true'):
+                queryset = queryset.filter(in_basket__user=self.request.user)
+            if is_in_cart in ('0', 'false'):
+                queryset = queryset.exclude(in_basket__user=self.request.user)
 
-        is_in_cart: str = self.request.query_params.get('is_in_shopping_cart')
-        if is_in_cart in ('1', 'true'):
-            queryset = queryset.filter(in_basket__user=self.request.user)
-        if is_in_cart in ('0', 'false'):
-            queryset = queryset.exclude(in_basket__user=self.request.user)
-
-        is_favorite: str = self.request.query_params.get('is_favorited')
-        if is_favorite in ('1', 'true'):
-            queryset = queryset.filter(in_favorite__user=self.request.user)
-        if is_favorite in ('0', 'false'):
-            queryset = queryset.exclude(in_favorite__user=self.request.user)
+            is_favorite: str = self.request.query_params.get('is_favorited')
+            if is_favorite in ('1', 'true'):
+                queryset = queryset.filter(in_favorite__user=self.request.user)
+            if is_favorite in ('0', 'false'):
+                queryset = queryset.exclude(
+                    in_favorite__user=self.request.user)
 
         return queryset
 

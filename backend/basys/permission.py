@@ -18,6 +18,9 @@ class ActivePermission(BasePermission):
 class AuthorOrReadOnly(ActivePermission):
     '''Права доступа для автора.'''
 
+    def has_permission(self, request: WSGIRequest, view: APIRootView) -> bool:
+        return True
+
     def has_object_permission(
             self, request: WSGIRequest, view: APIRootView, obj: Model) -> bool:
         return (

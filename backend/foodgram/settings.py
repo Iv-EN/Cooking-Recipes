@@ -47,7 +47,7 @@ ROOT_URLCONF = 'foodgram.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -110,10 +110,10 @@ DJOSER = {
         'user_list': 'basys.serialiser.UserSerializer',
     },
     'PERMISSIONS': {
-        'user': ('basys.permission.AuthorOrAdmin'),
-        'user_list': ('basys.permission.AuthorOrAdmin'),
-        'recipe': ('basys.permission.AuthorOrReadOnly'),
-        'recipe_list': ('basys.permission.AuthorOrReadOnly')
+        'user': ('basys.permission.AuthorOrAdmin',),
+        'user_list': ('basys.permission.AuthorOrAdmin',),
+        'recipe': ('basys.permission.AuthorOrReadOnly',),
+        'recipe_list': ('basys.permission.AuthorOrReadOnly',),
     },
 }
 
