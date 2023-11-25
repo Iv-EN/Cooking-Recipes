@@ -101,9 +101,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            sudo docker compose -f docker-compose.production.yml stop
-            sudo docker compose -f docker-compose.production.yml rm backend
-            sudo docker compose -f docker-compose.production.yml rm frontend
+            sudo docker compose stop
+            sudo docker compose rm backend
+            sudo docker compose rm frontend
             touch .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
@@ -114,7 +114,7 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest 
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
-            sudo docker compose -f docker-compose.production.yml up -d
+            sudo docker compose up -d
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
