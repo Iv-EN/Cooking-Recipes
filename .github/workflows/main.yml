@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ./backend/requirements/requirements.lint.txt
       - name: Run linter
-        run: python -m flake8 backend/
+        run: python -m flake8 .backend/
   
   tests:
     needs: lint
@@ -89,24 +89,10 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:v1.0   
   deploy:
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - build_and_push_to_docker_hub
     if: github.ref == 'refs/heads/master'
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Debug local directory contents
-        run: ls -la
-      - name: Copy docker-compose.yml via ssh
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.production.yml"
-          target: "foodgram"
-          overwrite: true
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
@@ -115,9 +101,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            ls -a
-            cd foodgram
-            ls -a
             sudo docker compose -f docker-compose.production.yml pull
             sudo docker compose -f docker-compose.production.yml down
             sudo docker compose -f docker-compose.production.yml up -d
