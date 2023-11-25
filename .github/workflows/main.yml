@@ -89,9 +89,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            sudo docker-compose stop
-            sudo docker-compose rm backend
-            sudo docker-compose rm frontend
+            sudo docker compose stop
+            sudo docker compose rm backend
+            sudo docker compose rm frontend
             touch .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
