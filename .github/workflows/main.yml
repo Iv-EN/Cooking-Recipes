@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ./backend/requirements/requirements.lint.txt
       - name: Run linter
-        run: python -m flake8 .backend/
+        run: python -m flake8 backend/
   
   tests:
     needs: lint
