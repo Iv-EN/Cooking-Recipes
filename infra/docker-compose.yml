@@ -50,6 +50,7 @@ services:
     networks:
       - foodgram_network
     image: nginx:1.19.3
+    restart: always
     ports:
       - 80:80
     volumes:
