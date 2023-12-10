@@ -95,14 +95,23 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Copy docker-compose.yml via ssh
-        uses: appleboy/ssh-action@master
+      - name: Copy docker-compose.production.yml via ssh
+        uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.production.yml"
+          source: "infra/docker-compose.production.yml"
+          target: "foodgram"
+      - name: Copy nginx.production.yml via ssh
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: "infra/nginx.production.conf"
           target: "foodgram"
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
@@ -112,10 +121,22 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd foodgram
-            sudo docker compose -f docker-compose.production.yml pull
-            sudo docker compose -f docker-compose.production.yml down
-            sudo docker compose -f docker-compose.production.yml up -d
+            cd foodgram/infra
+            rm .env
+            touch .env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            echo POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            echo DB_HOST=${{ secrets.DB_HOST }}
+            echo DB_PORT=${{ secrets.DB_PORT }}
+            echo SECRET_KEY=${{ secrets.SECRET_KEY }}
+            echo DEBUG=${{ secrets.DEBUG }}
+            echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            
+            sudo docker compose -f docker-compose.production.yml -v down
+            sudo docker rm -f foodgram_backend foodgram_frontend foodgram_nginx || true
+            sudo docker compose -f docker-compose.production.yml up -d --build
+            
   send_message:
     runs-on: ubuntu-latest
     needs: deploy

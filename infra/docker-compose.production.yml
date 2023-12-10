@@ -8,15 +8,16 @@ volumes:
 
 services:
   db:
-    container_name: postgre_db_prod_foodgram
+    container_name: foodgram_db
     image: postgres:13.10
     env_file:
       - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
     restart: always
+
   backend:
-    container_name: backend_prod_foodgram
+    container_name: foodgram_backend
     image: ivenauto/foodgram_backend
     env_file:
       - .env
@@ -26,30 +27,32 @@ services:
     depends_on:
       - db
     restart: on-failure
+
   frontend:
-    container_name: frontend_prod_foodgram
+    container_name: foodgram_frontend
     image: ivenauto/foodgram_frontend
     env_file:
       - .env
     command: cp -r /app/build. /static/
     volumes:
+      - ../frontend/:/app/result_build/
       - static:/static
     depends_on:
       - backend
     restart: no
   nginx:
-    container_name: nginx_prod_foodgram
+    container_name: foodgram_nginx
     image: nginx:1.19.3
     env_file:
       - .env
     ports:
-      - 8000:80
+      - '8000:80'
     volumes:
-      - /home/yc-user/foodgram/nginx.conf:/etc/nginx/conf.d/default.conf
+      - /nginx.conf:/etc/nginx/conf.d/default.conf
       - ./frontend/build:/usr/share/nginx/html/
       - ./docs/:/usr/share/nginx/html/api/docs/
-      - static:/var/html/static/
-      - media:/var/html/media/
+      - static:/staticfiles
+      - media:/media/
     depends_on:
       - backend
     restart: always
