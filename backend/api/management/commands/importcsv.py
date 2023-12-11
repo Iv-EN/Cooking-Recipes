@@ -1,7 +1,6 @@
 import csv
 import os
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from recipes.models import Ingredient, Tag
@@ -17,7 +16,9 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_csv_file(filename):
-        return os.path.join(settings.BASE_DIR, 'data', filename)
+        file_path = os.path.join('data', filename)
+        print('путь:', file_path)
+        return file_path
 
     @staticmethod
     def clear_model(model):
