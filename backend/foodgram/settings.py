@@ -133,7 +133,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CSRF_TRUSTED_ORIGINS = ['mybestfoodgram.ddns.net']
+CSRF_TRUSTED_ORIGINS = ['https://mybestfoodgram.ddns.net']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
