@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_csv_file(filename):
-        file_path = os.path.join(settings.BASE_DIR, 'data', filename)
+        file_path = f'{settings.CSV_DIR}/{filename}'
         print('путь:', file_path)
         return file_path
 
