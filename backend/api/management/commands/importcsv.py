@@ -1,6 +1,7 @@
 import csv
 import os
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from recipes.models import Ingredient, Tag
@@ -16,22 +17,17 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_csv_file(filename):
-        file_path = os.path.join('data', filename)
+        file_path = os.path.join(settings.BASE_DIR, 'data', filename)
         print('путь:', file_path)
         return file_path
-
-    @staticmethod
-    def clear_model(model):
-        model.objects.all().delete()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def load_model(self, model_name, field_names):
-        model, file_path = NAME_MODEL_FILE.get(model_name)
-        with open(self.get_csv_file(file_path), encoding='utf-8') as file:
+        model, filename = NAME_MODEL_FILE.get(model_name)
+        with open(self.get_csv_file(filename), encoding='utf-8') as file:
             reader = csv.reader(file, delimiter=',')
-            self.clear_model(model)
             line = 0
             for row in reader:
                 if row != '' and line > 0:

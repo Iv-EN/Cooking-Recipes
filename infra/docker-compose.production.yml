@@ -19,6 +19,7 @@ services:
   backend:
     container_name: foodgram_backend
     image: ivenauto/foodgram_backend
+    command: bash -c "python manage.py importcsv"
     env_file:
       - .env
     volumes:
