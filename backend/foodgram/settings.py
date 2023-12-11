@@ -14,6 +14,14 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://*localhost',
+    'https://*localhost',
+    'http://*mybestfoodgram.ddns.net',
+    'https://*mybestfoodgram.ddns.net',
+    'http://*84.201.161.161',
+    'https://*84.201.161.161',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -132,8 +140,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-CSRF_TRUSTED_ORIGINS = ['https://mybestfoodgram.ddns.net']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
