@@ -15,12 +15,7 @@ DEBUG = os.getenv('DEBUG') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://*localhost',
-    'https://*localhost',
-    'http://*mybestfoodgram.ddns.net',
-    'https://*mybestfoodgram.ddns.net',
-    'http://*84.201.161.161',
-    'https://*84.201.161.161',
+    'mybestfoodgram.ddns.net',
 ]
 
 INSTALLED_APPS = [
@@ -136,7 +131,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
