@@ -15,11 +15,11 @@ DEBUG = os.getenv('DEBUG') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://mybestfoodgram.ddns.net',
-    'https://84.201.161.161.127',
-    'http://localhost',
-    'http://27.0.0.1',
-    'http://*.backend',
+    'mybestfoodgram.ddns.net',
+    '84.201.161.161.127',
+    'localhost',
+    '27.0.0.1',
+    'backend',
 ]
 
 INSTALLED_APPS = [
