@@ -16,9 +16,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'mybestfoodgram.ddns.net',
-    '84.201.161.161.127',
+    '84.201.161.161',
     'localhost',
-    '27.0.0.1',
+    '127.0.0.1',
     'backend',
 ]
 
