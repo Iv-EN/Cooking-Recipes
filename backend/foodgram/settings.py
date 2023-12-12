@@ -14,6 +14,12 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://mybestfoodgram.ddns.net',
+    'https://84.201.161.161.127',
+    'http://localhost',
+    'http://127.0.0.1',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
