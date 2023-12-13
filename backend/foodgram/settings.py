@@ -140,6 +140,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+CSV_DIR = os.path.join(BASE_DIR, 'data')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MAX_LEN_EMAIL_FIELD = 254
