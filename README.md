@@ -4,9 +4,9 @@
 Проект развёрнут по адресу https://mybestfoodgram.ddns.net.
 Вход в админку по адресу:
   ```
-  https://mybestfoodgram.ddns.net/admin/admin
+  https://mybestfoodgram.ddns.net/admin/
   ```
-  Логин: admin
+  Логин: admin\n
   Password: admin
 
 ## Описание
@@ -29,7 +29,7 @@
 2. В папкe backend создайте файл `.env` со следующими переменными:
    ```
    SECRET_KEY=... # секретный ключ django-проекта
-   DEBUG=False
+   DEBUG=False # в режиме отладки рекомендуется указать True
    ALLOWED_HOSTS=... # IP/домен хоста, БД (указывается через запятую без пробелов)
    POSTGRES_USER=... # имя пользователя БД
    POSTGRES_PASSWORD=... # пароль от БД
@@ -40,7 +40,7 @@
 3. Перейдите в папку /infra/ 
 4. Соберите и запустите контейнеры:
    ```bash
-   sudo sudo docker compose up -d
+   sudo docker compose up -d
    ```
 5. Создайте супер пользователя:
    ```bash
