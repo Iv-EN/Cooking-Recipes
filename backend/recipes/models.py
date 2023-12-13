@@ -17,7 +17,7 @@ class Tag(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=settings.MAX_LEN_RECIPES_CHARFIELD,
-        validators=[ValidateName(field='Название тэга'),],
+        validators=[ValidateName(field='Название тэга'), ],
         unique=True
     )
     color = models.CharField(
