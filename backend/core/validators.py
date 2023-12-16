@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 @deconstructible
 class ValidateName:
-    '''Проверка имени пользователя'''
+    """Проверка имени пользователя"""
 
     def __init__(
         self,
@@ -42,7 +42,7 @@ class ColorValidator:
         self.hexdigits = set('0123456789abcdefABCDEF')
 
     def validate(self, color: str) -> str:
-        '''Проверка кодировки цвета на соответствие HEX.'''
+        """Проверка кодировки цвета на соответствие HEX."""
         color = color.strip(' #')
         if len(color) not in (3, 6):
             raise ValidationError(
@@ -56,16 +56,13 @@ class ColorValidator:
 
 
 class TagsValidator:
-    def __init__(self, tags_ids, Tag) -> None:
-        self.Tag = Tag
-        self.tags_ids = tags_ids
-
-    def validate(self) -> list['Tag']:
-        '''Проверка существования тэгов с указанными id.'''
-        if not self.tags_ids:
+    @staticmethod
+    def validate(tags_ids, Tag) -> list['Tag']:
+        """Проверка существования тэгов с указанными id."""
+        if not tags_ids:
             raise ValidationError('Тэгов нет')
-        tags = self.Tag.objects.filter(id__in=self.tags_ids)
-        if len(tags) != len(self.tags_ids):
+        tags = Tag.objects.filter(id__in=tags_ids)
+        if tags.count() != len(tags_ids):
             raise ValidationError('Указанный тэг не существует')
         return tags
 
@@ -79,7 +76,7 @@ class IngredientsValidator:
         ingredients: list[dict[str, str | int]],
         Ingredient: 'Ingredient',
     ) -> dict[int, tuple['Ingredient', int]]:
-        '''Проверка списка ингредиентов.'''
+        """Проверка списка ингредиентов."""
         if not ingredients:
             raise ValidationError('Не указано ни одного ингредиента')
         valid_ingredients = {}

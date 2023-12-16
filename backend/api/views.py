@@ -58,7 +58,6 @@ class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
     )
     def subscriptions(self, request: WSGIRequest) -> Response:
         """Список подписок пользователя."""
-
         annotated_queryset = User.objects.filter(
             subscribers__user=request.user
         ).annotate(recipes_count=Count('recipes'))

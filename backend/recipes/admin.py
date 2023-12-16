@@ -1,7 +1,10 @@
+from typing import Any
 from django.contrib.admin import (ModelAdmin, TabularInline,
                                   display, register, site)
 from django.contrib.auth.models import Group
 from django.core.handlers.wsgi import WSGIRequest
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from django.utils.html import format_html
 from django.utils.safestring import SafeString, mark_safe
 
@@ -14,7 +17,8 @@ site.site_header = 'Админ-зона Foodgram'
 
 
 class IngredientRecipeInLine(TabularInline):
-    '''Вывод количества ингридиентов в рецепте.'''
+    """Вывод количества ингридиентов в рецепте."""
+
     model = AmountIngredient
     extra = 2
 
@@ -45,6 +49,11 @@ class RecipeAdmin(ModelAdmin):
     search_fields = ('name', 'author__username', 'tags__name',)
     save_on_top = True
     inlines = (IngredientRecipeInLine,)
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        return super().get_queryset(request).select_related(
+            'author'
+        ).prefetch_related('ingredients', 'tags')
 
     def get_image(self, obj: Recipe) -> SafeString:
         return mark_safe(f'<img src={obj.image.url} width="80" hieght="30"')

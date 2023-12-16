@@ -48,3 +48,9 @@ class SubscriptionsAdmin(ModelAdmin):
         'author',
     )
     empty_value_display = '-empty-'
+
+    def get_subscriber_username(self, obj):
+        return obj.user.username
+
+    def get_author_username(self, obj):
+        return obj.author.username

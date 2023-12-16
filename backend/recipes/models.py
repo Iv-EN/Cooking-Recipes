@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Length
 from PIL import Image
@@ -13,7 +13,8 @@ models.CharField.register_lookup(Length)
 
 
 class Tag(models.Model):
-    '''Тэги для рецептов.'''
+    """Тэги для рецептов."""
+
     name = models.CharField(
         verbose_name='Название',
         max_length=settings.MAX_LEN_RECIPES_CHARFIELD,
@@ -51,7 +52,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    '''Ингредиенты для рецепта.'''
+    """Ингредиенты для рецепта."""
     name = models.CharField(
         verbose_name='Ингредиент',
         max_length=settings.MAX_LEN_RECIPES_CHARFIELD,
@@ -86,7 +87,7 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    '''Основная модель рецептов.'''
+    """Основная модель рецептов."""
     name = models.CharField(
         verbose_name='Название',
         max_length=settings.MAX_LEN_RECIPES_CHARFIELD,
@@ -120,7 +121,6 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         verbose_name='Описание блюда',
-        max_length=1000,
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления, мин',
@@ -129,6 +129,12 @@ class Recipe(models.Model):
             MinValueValidator(
                 settings.MIN_COOKING_TIME,
                 message=f'Не менее {settings.MIN_COOKING_TIME} мин.'
+            ),
+            MaxValueValidator(
+                settings.MAX_COOKING_TIME,
+                message=(
+                    f'Более {settings.MAX_COOKING_TIME} мин - слишком долго'
+                )
             ),
         ),
     )
@@ -163,7 +169,8 @@ class Recipe(models.Model):
 
 
 class AmountIngredient(models.Model):
-    '''Количество ингредиентов.'''
+    """Количество ингредиентов."""
+
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
@@ -183,6 +190,10 @@ class AmountIngredient(models.Model):
                 settings.MIN_AMOUNT_INGREDIENTS,
                 message=f'Не менее {settings.MIN_AMOUNT_INGREDIENTS}'
             ),
+            MaxValueValidator(
+                settings.MAX_AMOUNT_INGREDIENTS,
+                message='Слишком много!'
+            )
         ),
     )
 
@@ -205,7 +216,8 @@ class AmountIngredient(models.Model):
 
 
 class Favorite(models.Model):
-    '''Избранные рецепты.'''
+    """Избранные рецепты."""
+
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт из избранного',
@@ -239,7 +251,8 @@ class Favorite(models.Model):
 
 
 class Basket(models.Model):
-    '''Список покупок.'''
+    """Список покупок."""
+
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепты из списка покупок',

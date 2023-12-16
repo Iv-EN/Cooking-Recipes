@@ -5,7 +5,7 @@ from rest_framework.routers import APIRootView
 
 
 class ActivePermission(BasePermission):
-    '''Базовые разрешения с проверкой пользователь активен или забанен.'''
+    """Базовые разрешения с проверкой пользователь активен или забанен."""
 
     def has_permission(self, request: WSGIRequest, view: APIRootView) -> bool:
         return bool(
@@ -16,7 +16,7 @@ class ActivePermission(BasePermission):
 
 
 class AuthorOrReadOnly(ActivePermission):
-    '''Права доступа для автора.'''
+    """Права доступа для автора."""
 
     def has_permission(self, request: WSGIRequest, view: APIRootView) -> bool:
         return True
@@ -32,7 +32,7 @@ class AuthorOrReadOnly(ActivePermission):
 
 
 class AdminOrReadOnly(ActivePermission):
-    '''Права доступа для админов.'''
+    """Права доступа для админов."""
 
     def has_object_permission(
             self, request: WSGIRequest, view: APIRootView
@@ -46,7 +46,7 @@ class AdminOrReadOnly(ActivePermission):
 
 
 class AuthorOrAdmin(ActivePermission):
-    '''Права досступа для авторв и админа.'''
+    """Права досступа для авторв и админа."""
 
     def has_object_permission(
             self, request: WSGIRequest, view: APIRootView, obj: Model

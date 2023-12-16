@@ -8,7 +8,8 @@ app_name = 'api'
 
 
 class RuDefaultRouter(DefaultRouter):
-    '''Главная страница API на русском языке.'''
+    """Главная страница API на русском языке."""
+
     APIRootView = BaseApiRootView
 
 

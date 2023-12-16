@@ -15,7 +15,8 @@ User = get_user_model()
 
 
 class RecipeShortSerializer(ModelSerializer):
-    '''Сериализатор для модели Recipe.'''
+    """Сериализатор для модели Recipe."""
+
     class Meta:
         model = Recipe
         fields = ['id', 'name', 'image', 'cooking_time']
@@ -23,7 +24,8 @@ class RecipeShortSerializer(ModelSerializer):
 
 
 class UserSerializer(ModelSerializer):
-    '''Сериализатор для модели CustomUser.'''
+    """Сериализатор для модели CustomUser."""
+
     is_subscribed = SerializerMethodField()
 
     class Meta:
@@ -36,14 +38,14 @@ class UserSerializer(ModelSerializer):
         read_only_fields = ('is_subscribed',)
 
     def get_is_subscribed(self, obj: User) -> bool:
-        '''Проверка подписок.'''
+        """Проверка подписок."""
         user = self.context.get('request').user
         if user.is_anonymous or (user == obj):
             return False
         return user.subscriptions.filter(author=obj).exists()
 
     def create(self, validated_data: dict) -> User:
-        '''Создание нового пользователя.'''
+        """Создание нового пользователя."""
         user = User(
             email=validated_data['email'],
             username=validated_data['username'],
@@ -56,7 +58,8 @@ class UserSerializer(ModelSerializer):
 
 
 class UserSubscribeSerializer(UserSerializer):
-    '''Сериализатор вывода подписок текущего пользователя.'''
+    """Сериализатор вывода подписок текущего пользователя."""
+
     recipes = RecipeShortSerializer(many=True, read_only=True)
     recipes_count = IntegerField()
 
@@ -69,7 +72,7 @@ class UserSubscribeSerializer(UserSerializer):
         read_only_fields = fields
 
     def get_is_subscribed(self, obj: User) -> bool:
-        '''Проверка наличия подписок.'''
+        """Проверка наличия подписок."""
         return True
 
 
@@ -84,14 +87,14 @@ class TagSerializer(ModelSerializer):
         read_only_fields = fields
 
     def validate(self, attrs: OrderedDict) -> OrderedDict:
-        '''Унификация вводных данных тэга.'''
+        """Унификация вводных данных тэга."""
         for attr, value in attrs.items():
             attrs[attr] = value.sttrip(' #').upper()
         return attrs
 
 
 class IngredientSerializer(ModelSerializer):
-    '''Сериализатор вывода ингридиентов.'''
+    """Сериализатор вывода ингридиентов."""
 
     class Meta:
         model = Ingredient
@@ -100,7 +103,8 @@ class IngredientSerializer(ModelSerializer):
 
 
 class RecipeSerialiser(ModelSerializer):
-    '''Сериализатор рецептов.'''
+    """Сериализатор рецептов."""
+
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = SerializerMethodField()
@@ -117,7 +121,7 @@ class RecipeSerialiser(ModelSerializer):
         read_only_fields = ('is_favorited', 'is_in_shopping_cart',)
 
     def get_ingredients(self, recipe: Recipe) -> QuerySet[dict]:
-        '''Получение списка ингредиентов для рецепта.'''
+        """Получение списка ингредиентов для рецепта."""
         ingredients = recipe.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F(
                 'ingredient_recipes__amount'
@@ -126,27 +130,27 @@ class RecipeSerialiser(ModelSerializer):
         return ingredients
 
     def get_is_favorited(self, recipe: Recipe) -> bool:
-        '''Проверка нахождения рецепта в избранных.'''
+        """Проверка нахождения рецепта в избранных."""
         user = self.context.get('view').request.user
         if user.is_anonymous:
             return False
         return user.favorite.filter(recipe=recipe).exists()
 
     def get_is_in_shopping_cart(self, recipe: Recipe) -> bool:
-        '''Проверка нахождения рецепта в списке покупок.'''
+        """Проверка нахождения рецепта в списке покупок."""
         user = self.context.get('view').request.user
         if user.is_anonymous:
             return False
         return user.basket.filter(recipe=recipe).exists()
 
     def validate(self, data: OrderedDict) -> OrderedDict:
-        '''Проверка данных при создании/редактировании рецепта.'''
+        """Проверка данных при создании/редактировании рецепта."""
         tags_id: list[int] = self.initial_data.get('tags')
         ingredients = self.initial_data.get('ingredients')
         if not tags_id or not ingredients:
             raise ValidationError('Не хватает данных')
-        tags_validator = TagsValidator(tags_id, Tag)
-        tags = tags_validator.validate()
+        tags_validator = TagsValidator()
+        tags = tags_validator.validate(tags_id, Tag)
         ingredients = IngredientsValidator.validate(ingredients, Ingredient)
         data.update(
             {'tags': tags, 'ingredients': ingredients,
@@ -156,7 +160,7 @@ class RecipeSerialiser(ModelSerializer):
 
     @atomic
     def create(self, validated_data: dict) -> Recipe:
-        '''Создание рецепта.'''
+        """Создание рецепта."""
         tags: list[int] = validated_data.pop('tags')
         ingredients: dict[int, tuple] = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
@@ -165,13 +169,11 @@ class RecipeSerialiser(ModelSerializer):
         return recipe
 
     @atomic
-    def update(self, recipe: Recipe, validated_data: dict):
-        '''Изменение рецепта.'''
+    def update(self, intance: Recipe, validated_data: dict):
+        """Изменение рецепта."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        for key, value in validated_data.items():
-            if hasattr(recipe, key):
-                setattr(recipe, key, value)
+        recipe = super().update(intance, validated_data)
         if tags:
             recipe.tags.clear()
             recipe.tags.set(tags)

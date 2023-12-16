@@ -11,7 +11,8 @@ class SearchIngredientFilter(SearchFilter):
 
 
 class FilterRecipes(FilterSet):
-    '''Фильтр сортировки рецептов.'''
+    """Фильтр сортировки рецептов."""
+
     tags = AllValuesMultipleFilter(
         field_name='tags__slug',
         label='tags'

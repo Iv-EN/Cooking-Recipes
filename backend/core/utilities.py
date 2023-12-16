@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 def recipe_ingredients_set(
         recipe: Recipe, ingredients: dict[int, tuple['Ingredient', int]]
 ) -> None:
-    '''Запись ингредиентов рецепта.'''
+    """Запись ингредиентов рецепта."""
     objs = []
     for ingredient, amount in ingredients.values():
         objs.append(
@@ -28,7 +28,7 @@ def recipe_ingredients_set(
 
 
 def create_shoping_list(user: 'CustomUser') -> str:
-    '''Формирование списка продуктов для покупки.'''
+    """Формирование списка продуктов для покупки."""
     shopping_list = [
         f'Список покупок для пользователя: {user.first_name}'
         f'\n{dt.now().strftime(settings.DATETIME_FORMAT)}\n'
@@ -51,7 +51,7 @@ def create_shoping_list(user: 'CustomUser') -> str:
 
 
 def incorrect_keyboard_layout(url_string: str) -> str:
-    '''Перевод слов, если не переключена раскладка.'''
+    """Перевод слов, если не переключена раскладка."""
     equals = str.maketrans(
         "qwertyuiop[]asdfghjkl;'zxcvbnm,./",
         "йцукенгшщзхъфывапролджэячсмитьбю.",
