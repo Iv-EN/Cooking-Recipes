@@ -6,7 +6,7 @@
   ```
   https://mybestfoodgram.ddns.net/admin/
   ```
-  Логин: admin
+  E-mail: admin@admin.ru
   Password: admin
 
 ## Описание
