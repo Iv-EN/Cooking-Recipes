@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='follow',
-            options={'ordering': ['-id'], 'verbose_name': 'Подписка', 'verbose_name_plural': 'Подписки'},
+            options={'ordering': [
+                '-id'], 'verbose_name': 'Подписка', 'verbose_name_plural': 'Подписки'},
         ),
         migrations.RemoveConstraint(
             model_name='follow',
@@ -20,14 +21,17 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='customuser',
-            constraint=models.UniqueConstraint(fields=('email', 'username'), name='unique_auth'),
+            constraint=models.UniqueConstraint(
+                fields=('email', 'username'), name='unique_auth'),
         ),
         migrations.AddConstraint(
             model_name='follow',
-            constraint=models.UniqueConstraint(fields=('author', 'following'), name='Вы уже подписаны на этого автора'),
+            constraint=models.UniqueConstraint(
+                fields=('author', 'following'), name='Вы уже подписаны на этого автора'),
         ),
         migrations.AddConstraint(
             model_name='follow',
-            constraint=models.CheckConstraint(check=models.Q(('author', models.F('following')), _negated=True), name='Нельзя подписаться на себя'),
+            constraint=models.CheckConstraint(check=models.Q(('author', models.F(
+                'following')), _negated=True), name='Нельзя подписаться на себя'),
         ),
     ]

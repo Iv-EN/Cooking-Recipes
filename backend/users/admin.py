@@ -1,11 +1,13 @@
-from django.contrib.admin import register
+from django.contrib.admin import ModelAdmin, register
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser
+from .models import CustomUser, Subscriptions
 
 
 @register(CustomUser)
 class MyUserAdmin(UserAdmin):
+    """Модель пользователей в админке."""
+
     list_display = (
         'is_active',
         'username',
@@ -26,3 +28,23 @@ class MyUserAdmin(UserAdmin):
     search_fields = ('username', 'email')
     list_filter = ('is_active', 'first_name', 'email',)
     save_on_top = True
+
+
+@register(Subscriptions)
+class SubscriptionsAdmin(ModelAdmin):
+    """Модель подписок в админке."""
+
+    list_display = (
+        'pk',
+        'user',
+        'author',
+    )
+    search_fields = (
+        'user',
+        'author'
+    )
+    list_filter = (
+        'user',
+        'author',
+    )
+    empty_value_display = '-empty-'

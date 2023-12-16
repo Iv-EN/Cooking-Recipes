@@ -1,11 +1,11 @@
 '''Вспомогательные утилиты.'''
+from django.conf import settings
 from datetime import datetime as dt
 from typing import TYPE_CHECKING
 from urllib.parse import unquote
 
 from django.db.models import F, Sum
 
-from foodgram.settings import DATETIME_FORMAT
 from recipes.models import AmountIngredient, Recipe
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ def create_shoping_list(user: 'CustomUser') -> str:
     '''Формирование списка продуктов для покупки.'''
     shopping_list = [
         f'Список покупок для пользователя: {user.first_name}'
-        f'\n{dt.now().strftime(DATETIME_FORMAT)}\n'
+        f'\n{dt.now().strftime(settings.DATETIME_FORMAT)}\n'
     ]
     ingredients = (
         AmountIngredient.objects.filter(recipe__in_basket__user=user)

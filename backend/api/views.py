@@ -1,4 +1,4 @@
-from django.db.models import Q, QuerySet
+from django.db.models import Count, Q, QuerySet
 from django.contrib.auth import get_user_model
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
@@ -12,13 +12,13 @@ from rest_framework.routers import APIRootView
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from basys.mixins import AddDelViewMixin
-from basys.paginations import LimitPagePagination
-from basys.permission import AuthorOrReadOnly, AdminOrReadOnly
-from basys.serializers import (IngredientSerializer, RecipeSerialiser,
-                               RecipeShortSerializer, TagSerializer,
-                               UserSubscribeSerializer,)
-from basys.utilities import create_shoping_list, incorrect_keyboard_layout
+from .mixins import AddDelViewMixin
+from .paginations import LimitPagePagination
+from .permission import AuthorOrReadOnly, AdminOrReadOnly
+from .serializers import (IngredientSerializer, RecipeSerialiser,
+                          RecipeShortSerializer, TagSerializer,
+                          UserSubscribeSerializer,)
+from core.utilities import create_shoping_list, incorrect_keyboard_layout
 from recipes.models import (Favorite, Ingredient, Recipe,
                             Basket, Tag)
 from users.models import Subscriptions
@@ -27,11 +27,11 @@ User = get_user_model()
 
 
 class BaseApiRootView(APIRootView):
-    '''Базовые пути API.'''
+    """Базовые пути API."""
 
 
 class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
-    '''Вьюсет для пользователей.'''
+    """Вьюсет для пользователей."""
     pagination_class = LimitPagePagination
     permission_classes = (DjangoModelPermissions,)
     add_serializer = UserSubscribeSerializer
@@ -45,35 +45,39 @@ class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
     def create_subscribe(
         self, request: WSGIRequest, id: int | str
     ) -> Response:
-        return self._create_relation(id)
+        return self._create_relation(Subscriptions, id)
 
     @subscribe.mapping.delete
     def delete_subscribe(
         self, request: WSGIRequest, id: int | str
     ) -> Response:
-        return self._delete_relation(Q(author__id=id))
+        return self._delete_relation(Subscriptions, Q(author__id=id))
 
     @action(
         methods=('get',), detail=False, permission_classes=(IsAuthenticated,)
     )
     def subscriptions(self, request: WSGIRequest) -> Response:
-        '''Список подписок пользователя.'''
-        pages = self.paginate_queryset(
-            User.objects.filter(subscribers__user=self.request.user)
-        )
+        """Список подписок пользователя."""
+
+        annotated_queryset = User.objects.filter(
+            subscribers__user=request.user
+        ).annotate(recipes_count=Count('recipes'))
+        pages = self.paginate_queryset(annotated_queryset)
         serialiser = UserSubscribeSerializer(pages, many=True)
         return self.get_paginated_response(serialiser.data)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
-    '''Вьюсет для тэгов.'''
+    """Вьюсет для тэгов."""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
-    '''Вьюсет для ингредиентов.'''
+    """Вьюсет для ингредиентов."""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AdminOrReadOnly,)
@@ -93,8 +97,9 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet, AddDelViewMixin):
-    '''Вьюсет для рецептов.'''
-    queryset = Recipe.objects.select_related('author')
+    """Вьюсет для рецептов."""
+
+    queryset = Recipe.objects.all()
     serializer_class = RecipeSerialiser
     pagination_class = LimitPagePagination
     permission_classes = (AuthorOrReadOnly,)
@@ -102,9 +107,10 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
 
     def get_queryset(self) -> QuerySet[Recipe]:
         '''Получение списка запрошенных объектов.'''
-        queryset = self.queryset
-
-        tags: list = self. request.query_params.getlist('tags')
+        queryset = Recipe.objects.select_related('author').prefetch_related(
+            'ingredient__ingredients', 'tags'
+        )
+        tags: list = self.request.query_params.getlist('tags')
         if tags:
             queryset = queryset.filter(tags__slug__in=tags).distinct()
 
@@ -131,41 +137,36 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
 
     @action(detail=True, permission_classes=(IsAuthenticated,))
     def favorite(self, request: WSGIRequest, pk: int | str) -> Response:
-        '''Добавление/удаление рецепта в избранное.'''
-
+        """Добавление/удаление рецепта в избранное."""
     @favorite.mapping.post
-    def recipe_to_favortes(
+    def recipe_to_favorites(
         self, requerest: WSGIRequest, pk: int | str
     ) -> Response:
-        self.link_model = Favorite
-        return self._create_relation(pk)
+        return self._create_relation(Favorite, pk)
 
     @favorite.mapping.delete
     def remove_recipe_from_favorites(
         self, request: WSGIRequest, pk: int | str
     ) -> Response:
-        self.link_model = Favorite
-        return self._delete_relation(Q(recipe__id=pk))
+        return self._delete_relation(Favorite, Q(recipe__id=pk))
 
     @action(detail=True, permission_classes=(IsAuthenticated,))
     def shopping_cart(self, request: WSGIRequest, pk: int | str) -> Response:
-        '''Добавление/удаление рецепта в список покупок.'''
-
+        """Добавление/удаление рецепта в список покупок."""
     @shopping_cart.mapping.post
     def recipe_to_cart(self, request: WSGIRequest, pk: int | str) -> Response:
-        self.link_model = Basket
-        return self._create_relation(pk)
+        return self._create_relation(Basket, pk)
 
     @shopping_cart.mapping.delete
     def remove_recipe_from_cart(
         self, request: WSGIRequest, pk: int | str
     ) -> Response:
         self.link_model = Basket
-        return self._delete_relation(Q(recipe__id=pk))
+        return self._delete_relation(Basket, Q(recipe__id=pk))
 
     @action(methods=('get',), detail=False)
     def download_shopping_cart(self, request: WSGIRequest) -> Response:
-        '''Создание файла *.txt со списком покупок.'''
+        """Создание файла *.txt со списком покупок."""
         user = self.request.user
         if not user.basket.exists():
             return Response(status=HTTP_400_BAD_REQUEST)

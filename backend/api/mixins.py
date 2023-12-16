@@ -11,15 +11,15 @@ from rest_framework.status import (
 
 
 class AddDelViewMixin:
-    '''Методы для добавления/удаления объекта связи между моделями.'''
-    add_serializer: ModelSerializer | None = None
-    link_model: Model | None = None
+    """Методы для добавления/удаления объекта связи между моделями."""
 
-    def _create_relation(self, obj_id: int | str) -> Response:
-        '''Добавление связи М2М между объектами.'''
+    add_serializer: ModelSerializer | None = None
+
+    def _create_relation(self, model, obj_id: int | str) -> Response:
+        """Добавление связи М2М между объектами."""
         obj = get_object_or_404(self.queryset, pk=obj_id)
         try:
-            self.link_model(None, obj.pk, self.request.user.pk).save()
+            model(None, obj.pk, self.request.user.pk).save()
         except IntegrityError:
             return Response(
                 {'error': 'Действие уже выполнено.'},
@@ -28,12 +28,9 @@ class AddDelViewMixin:
         serializer: ModelSerializer = self.add_serializer(obj)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
-    def _delete_relation(self, q: Q) -> Response:
-        '''Удаление связи М2М между объектами.'''
-        deleted, _ = (
-            self.link_model.objects.filter(
-                q & Q(user=self.request.user)).first().delete()
-        )
+    def _delete_relation(self, model, q: Q) -> Response:
+        """Удаление связи М2М между объектами."""
+        deleted, _ = model.objects.filter(q).delete()
         if not deleted:
             return Response(
                 {'error': f'{self.link_model.__name__} не существует'},

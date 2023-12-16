@@ -111,16 +111,16 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user': 'basys.serializers.UserSerializer',
-        'user_create': 'basys.serializers.UserSerializer',
-        'current_user': 'basys.serializers.UserSerializer',
-        'user_list': 'basys.serialiser.UserSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+        'user_list': 'api.serialiser.UserSerializer',
     },
     'PERMISSIONS': {
-        'user': ('basys.permission.AuthorOrAdmin',),
-        'user_list': ('basys.permission.AuthorOrAdmin',),
-        'recipe': ('basys.permission.AuthorOrReadOnly',),
-        'recipe_list': ('basys.permission.AuthorOrReadOnly',),
+        'user': ('api.permission.AuthorOrAdmin',),
+        'user_list': ('api.permission.AuthorOrAdmin',),
+        'recipe': ('api.permission.AuthorOrReadOnly',),
+        'recipe_list': ('api.permission.AuthorOrReadOnly',),
     },
 }
 

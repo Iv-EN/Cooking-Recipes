@@ -2,12 +2,15 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from basys import texts
-from basys.validators import ValidateName
+from core import texts
+from core.validators import ValidateName
 
 
 class CustomUser(AbstractUser):
-    """Пользователь"""
+    """Пользователь."""
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('first_name', 'last_name', 'username')
     username = models.CharField(
         verbose_name='Логин',
         max_length=settings.MAX_LEN_USERS_FIELD,
@@ -67,7 +70,7 @@ class CustomUser(AbstractUser):
 
 
 class Subscriptions(models.Model):
-    '''Подписка пользователей друг на друга.'''
+    """Подписка пользователей друг на друга."""
 
     author = models.ForeignKey(
         CustomUser,
@@ -93,11 +96,11 @@ class Subscriptions(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'user'),
-                name='Вы уже подписаны на этого автора',
+                name='You_are_already_subscribed_to_this_author',
             ),
             models.CheckConstraint(
                 check=~models.Q(author=models.F('user')),
-                name='Нельзя подписаться на себя',
+                name="You_can't_follow_yourself",
             ),
         )
         ordering = ['-id']

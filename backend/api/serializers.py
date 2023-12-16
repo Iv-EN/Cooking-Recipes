@@ -5,10 +5,10 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, QuerySet
 from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, IntegerField, SerializerMethodField
 
-from basys.validators import IngredientsValidator, TagsValidator
-from basys.utilities import recipe_ingredients_set
+from core.validators import IngredientsValidator, TagsValidator
+from core.utilities import recipe_ingredients_set
 from recipes.models import Ingredient, Recipe, Tag
 
 User = get_user_model()
@@ -18,7 +18,7 @@ class RecipeShortSerializer(ModelSerializer):
     '''Сериализатор для модели Recipe.'''
     class Meta:
         model = Recipe
-        fields = 'id', 'name', 'image', 'cooking_time'
+        fields = ['id', 'name', 'image', 'cooking_time']
         read_only_fields = fields
 
 
@@ -58,7 +58,7 @@ class UserSerializer(ModelSerializer):
 class UserSubscribeSerializer(UserSerializer):
     '''Сериализатор вывода подписок текущего пользователя.'''
     recipes = RecipeShortSerializer(many=True, read_only=True)
-    recipes_count = SerializerMethodField()
+    recipes_count = IntegerField()
 
     class Meta:
         model = User
@@ -71,10 +71,6 @@ class UserSubscribeSerializer(UserSerializer):
     def get_is_subscribed(self, obj: User) -> bool:
         '''Проверка наличия подписок.'''
         return True
-
-    def get_recipes_count(self, obj: User) -> int:
-        '''Определяет количество рецептов у автора.'''
-        return obj.recipes.count()
 
 
 class TagSerializer(ModelSerializer):

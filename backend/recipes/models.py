@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models.functions import Length
 from PIL import Image
 
-from basys.validators import ColorValidator, ValidateName
+from core.validators import ColorValidator, ValidateName
 
 User = get_user_model()
 
@@ -96,7 +96,7 @@ class Recipe(models.Model):
         User,
         verbose_name='Автор рецепта',
         related_name='recipes',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
     )
     tags = models.ManyToManyField(
