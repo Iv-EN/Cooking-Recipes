@@ -96,11 +96,11 @@ class Subscriptions(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'user'),
-                name='You_are_already_subscribed_to_this_author',
+                name='you_are_already_subscribed_to_this_author',
             ),
             models.CheckConstraint(
                 check=~models.Q(author=models.F('user')),
-                name="You_can't_follow_yourself",
+                name='you_can\'t_follow_yourself',
             ),
         )
         ordering = ['-id']

@@ -57,25 +57,25 @@ class ColorValidator:
 
 class TagsValidator:
     @staticmethod
-    def validate(tags_ids, Tag) -> list['Tag']:
+    def validate(tags_ids, tag) -> list['Tag']:
         """Проверка существования тэгов с указанными id."""
         if not tags_ids:
             raise ValidationError('Тэгов нет')
-        tags = Tag.objects.filter(id__in=tags_ids)
+        tags = tag.objects.filter(id__in=tags_ids)
         if tags.count() != len(tags_ids):
             raise ValidationError('Указанный тэг не существует')
         return tags
 
 
 class IngredientsValidator:
-    def __init__(self, Ingredients, Ingredient) -> None:
-        self.Ingredients = Ingredients
-        self.Ingredient = Ingredient
+    def __init__(self, ingredients, ingredient) -> None:
+        self.ingredients = ingredients
+        self.ingredient = ingredient
 
-    def validate(
-        ingredients: list[dict[str, str | int]],
-        Ingredient: 'Ingredient',
-    ) -> dict[int, tuple['Ingredient', int]]:
+    def validate(self,
+                 ingredients: list[dict[str, str | int]],
+                 ingredient_model: 'Ingredient',
+                 ) -> dict[int, tuple['Ingredient', int]]:
         """Проверка списка ингредиентов."""
         if not ingredients:
             raise ValidationError('Не указано ни одного ингредиента')
@@ -89,7 +89,7 @@ class IngredientsValidator:
                 raise ValidationError('Проверьте количество ингредиента')
         if not valid_ingredients:
             raise ValidationError('Неправильные ингредиенты')
-        db_inredients = Ingredient.objects.filter(
+        db_inredients = ingredient_model.objects.filter(
             pk__in=valid_ingredients.keys())
         if not db_inredients:
             raise ValidationError('Неправильные ингредиенты')

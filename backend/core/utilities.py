@@ -1,4 +1,4 @@
-'''Вспомогательные утилиты.'''
+"""Вспомогательные утилиты."""
 from django.conf import settings
 from datetime import datetime as dt
 from typing import TYPE_CHECKING
@@ -39,14 +39,15 @@ def create_shoping_list(user: 'CustomUser') -> str:
                 measurement=F('ingredients__measurement_unit'))
         .annotate(amount=Sum('amount'))
     )
-    ing_list = (
-        f'{ing["ingredients__name"]}: {ing["amount"]} {ing["measurement"]}'
-        for ing in ingredients
+    ingredients_list = (
+        f'{ingredient["ingredients__name"]}: {ingredient["amount"]}'
+        f'{ingredient["measurement"]}'
+        for ingredient in ingredients
     )
-    shopping_list.extend(ing_list)
+    shopping_list.extend(ingredients_list)
     shopping_list.append(
         '\n Составлено в Foodgram.\n'
-        'Автор - студент 24 когорты Евгений Иванов.')
+        'Автор - студент 26 когорты Евгений Иванов.')
     return "\n".join(shopping_list)
 
 

@@ -21,7 +21,7 @@ class RecipeShortSerializer(ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'name', 'image', 'cooking_time']
+        fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = fields
 
 
@@ -175,12 +175,10 @@ class RecipeSerialiser(ModelSerializer):
         """Изменение рецепта."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = super().update(intance, validated_data)
         if tags:
-            recipe.tags.clear()
-            recipe.tags.set(tags)
+            intance.tags.clear()
+            intance.tags.set(tags)
         if ingredients:
-            recipe.ingredients.clear()
-            recipe_ingredients_set(recipe, ingredients)
-        recipe.save()
-        return recipe
+            intance.ingredients.clear()
+            recipe_ingredients_set(intance, ingredients)
+        return super().update(intance, validated_data)

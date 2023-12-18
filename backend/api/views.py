@@ -32,6 +32,7 @@ class BaseApiRootView(APIRootView):
 
 class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
     """Вьюсет для пользователей."""
+
     pagination_class = LimitPagePagination
     permission_classes = (DjangoModelPermissions,)
     add_serializer = UserSubscribeSerializer
@@ -83,13 +84,12 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self) -> list[Ingredient]:
         name: str = self.request.query_params.get('name')
-        queryset = self.queryset
         if not name:
-            return queryset
+            return self.queryset
         name = incorrect_keyboard_layout(name)
-        start_queryset = queryset.filter(name__istartswith=name)
+        start_queryset = self.queryset.filter(name__istartswith=name)
         start_names = (ing.name for ing in start_queryset)
-        contain_queryset = queryset.filter(name__icontains=name).exclude(
+        contain_queryset = self.queryset.filter(name__icontains=name).exclude(
             name__in=start_names
         )
         return list(start_queryset) + list(contain_queryset)
@@ -98,40 +98,41 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     """Вьюсет для рецептов."""
 
-    queryset = Recipe.objects.all()
     serializer_class = RecipeSerialiser
     pagination_class = LimitPagePagination
     permission_classes = (AuthorOrReadOnly,)
     add_serializer = RecipeShortSerializer
 
     def get_queryset(self) -> QuerySet[Recipe]:
-        '''Получение списка запрошенных объектов.'''
+        """Получение списка запрошенных объектов."""
         queryset = Recipe.objects.select_related('author').prefetch_related(
             'ingredient__ingredients', 'tags'
         )
         tags: list = self.request.query_params.getlist('tags')
         if tags:
-            queryset = queryset.filter(tags__slug__in=tags).distinct()
+            queryset = self.queryset.filter(tags__slug__in=tags).distinct()
 
         author: str = self.request.query_params.get('author')
         if author:
-            queryset = queryset.filter(author=author)
+            queryset = self.queryset.filter(author=author)
 
         if self.request.user.is_authenticated:
             is_in_cart: str = self.request.query_params.get(
                 'is_in_shopping_cart')
             if is_in_cart in ('1', 'true'):
-                queryset = queryset.filter(in_basket__user=self.request.user)
+                queryset = self.queryset.filter(
+                    in_basket__user=self.request.user)
             if is_in_cart in ('0', 'false'):
-                queryset = queryset.exclude(in_basket__user=self.request.user)
+                queryset = self.queryset.exclude(
+                    in_basket__user=self.request.user)
 
             is_favorite: str = self.request.query_params.get('is_favorited')
             if is_favorite in ('1', 'true'):
-                queryset = queryset.filter(in_favorite__user=self.request.user)
-            if is_favorite in ('0', 'false'):
-                queryset = queryset.exclude(
+                queryset = self.queryset.filter(
                     in_favorite__user=self.request.user)
-
+            if is_favorite in ('0', 'false'):
+                queryset = self.queryset.exclude(
+                    in_favorite__user=self.request.user)
         return queryset
 
     @action(detail=True, permission_classes=(IsAuthenticated,))
@@ -139,7 +140,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         """Добавление/удаление рецепта в избранное."""
     @favorite.mapping.post
     def recipe_to_favorites(
-        self, requerest: WSGIRequest, pk: int | str
+        self, request: WSGIRequest, pk: int | str
     ) -> Response:
         return self._create_relation(Favorite, pk)
 
@@ -160,7 +161,6 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     def remove_recipe_from_cart(
         self, request: WSGIRequest, pk: int | str
     ) -> Response:
-        self.link_model = Basket
         return self._delete_relation(Basket, Q(recipe__id=pk))
 
     @action(methods=('get',), detail=False)
@@ -174,5 +174,5 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         response = HttpResponse(
             shopping_list, content_type='text.txt; charset=utf-8'
         )
-        response['Cotent-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
