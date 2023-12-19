@@ -101,7 +101,8 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     def get_queryset(self) -> QuerySet[Recipe]:
         """Получение списка запрошенных объектов."""
         queryset = Recipe.objects.select_related('author').prefetch_related(
-            'ingredient__ingredients', 'tags'
+            'ingredient__ingredients', 'tags', 'is_in_shopping_cart',
+            'is_favorited',
         )
         tags: list = self. request.query_params.getlist('tags')
         if tags:
