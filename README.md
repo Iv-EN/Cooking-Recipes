@@ -2,8 +2,8 @@
 
 ## https://mybestfoodgram.ddns.net
 - IP 84.201.161.161
-Проект развёрнут по адресу https://mybestfoodgram.ddns.net.
-Вход в админку по адресу:
+- Проект развёрнут по адресу https://mybestfoodgram.ddns.net.
+- Вход в админку по адресу:
   ```
   https://mybestfoodgram.ddns.net/admin/
   ```
