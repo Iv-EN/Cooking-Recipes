@@ -85,6 +85,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     def get_queryset(self) -> list[Ingredient]:
         name: str = self.request.query_params.get('name').strip()
         if name:
+            name = incorrect_keyboard_layout(name)
             return self.queryset.filter(name__icontains=name)
         return self.queryset
 
