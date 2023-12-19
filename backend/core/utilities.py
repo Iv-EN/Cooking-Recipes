@@ -47,7 +47,7 @@ def create_shoping_list(user: 'CustomUser') -> str:
     shopping_list.extend(ingredients_list)
     shopping_list.append(
         '\n Составлено в Foodgram.\n'
-        'Автор - студент 26 когорты Евгений Иванов.')
+        'Автор - студент 24 когорты Евгений Иванов.')
     return "\n".join(shopping_list)
 
 

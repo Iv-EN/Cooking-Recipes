@@ -92,9 +92,7 @@ class ShoppingCartAdmin(ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'user', 'recipe__author').prefetch_related(
-                'recipe__ingredients', 'recipe__tags'
-        )
+            'user', 'recipe')
 
     def has_change_permission(
         self, request: WSGIRequest, obj: Basket | None = None
@@ -114,9 +112,7 @@ class FavoritesRecipesAdmin(ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'user', 'recipe__author').prefetch_related(
-                'recipe__ingredients', 'recipe__tags'
-        )
+            'user', 'recipe')
 
     def has_change_permission(
         self, request: WSGIRequest, obj: Favorite | None = None

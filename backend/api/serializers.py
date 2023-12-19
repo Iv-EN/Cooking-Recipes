@@ -8,7 +8,6 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (
     ModelSerializer, IntegerField, SerializerMethodField
 )
-
 from core.validators import IngredientsValidator, TagsValidator
 from core.utilities import recipe_ingredients_set
 from recipes.models import Ingredient, Recipe, Tag
@@ -61,7 +60,6 @@ class UserSerializer(ModelSerializer):
 
 class UserSubscribeSerializer(UserSerializer):
     """Сериализатор вывода подписок текущего пользователя."""
-
     recipes = RecipeShortSerializer(many=True, read_only=True)
     recipes_count = IntegerField()
 
@@ -79,7 +77,7 @@ class UserSubscribeSerializer(UserSerializer):
 
 
 class TagSerializer(ModelSerializer):
-    '''Сериализатор вывода тэгов.'''
+    """Сериализатор вывода тэгов."""
 
     class Meta:
         model = Tag
@@ -124,12 +122,11 @@ class RecipeSerialiser(ModelSerializer):
 
     def get_ingredients(self, recipe: Recipe) -> QuerySet[dict]:
         """Получение списка ингредиентов для рецепта."""
-        ingredients = recipe.ingredients.values(
+        return recipe.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F(
                 'ingredient_recipes__amount'
             )
         )
-        return ingredients
 
     def get_is_favorited(self, recipe: Recipe) -> bool:
         """Проверка нахождения рецепта в избранных."""
@@ -151,8 +148,8 @@ class RecipeSerialiser(ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if not tags_id or not ingredients:
             raise ValidationError('Не хватает данных')
-        tags_validator = TagsValidator()
-        tags = tags_validator.validate(tags_id, Tag)
+        tags_validator = TagsValidator(tags_id, Tag)
+        tags = tags_validator.validate()
         ingredients = IngredientsValidator.validate(ingredients, Ingredient)
         data.update(
             {'tags': tags, 'ingredients': ingredients,
@@ -171,14 +168,14 @@ class RecipeSerialiser(ModelSerializer):
         return recipe
 
     @atomic
-    def update(self, intance: Recipe, validated_data: dict):
+    def update(self, instance: Recipe, validated_data: dict):
         """Изменение рецепта."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         if tags:
-            intance.tags.clear()
-            intance.tags.set(tags)
+            instance.tags.clear()
+            instance.tags.set(tags)
         if ingredients:
-            intance.ingredients.clear()
-            recipe_ingredients_set(intance, ingredients)
-        return super().update(intance, validated_data)
+            instance.ingredients.clear()
+            recipe_ingredients_set(instance, ingredients)
+        return super().update(instance, validated_data)

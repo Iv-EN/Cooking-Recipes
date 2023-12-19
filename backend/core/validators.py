@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 @deconstructible
 class ValidateName:
-    """Проверка имени пользователя"""
+    """Проверка имени пользователя."""
 
     def __init__(
         self,
@@ -56,6 +56,7 @@ class ColorValidator:
 
 
 class TagsValidator:
+
     @staticmethod
     def validate(tags_ids, tag) -> list['Tag']:
         """Проверка существования тэгов с указанными id."""

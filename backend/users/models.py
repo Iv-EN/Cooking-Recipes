@@ -100,7 +100,7 @@ class Subscriptions(models.Model):
             ),
             models.CheckConstraint(
                 check=~models.Q(author=models.F('user')),
-                name='you_can\'t_follow_yourself',
+                name='impossible_subscribe_to_yourself',
             ),
         )
         ordering = ['-id']
