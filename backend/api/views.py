@@ -1,5 +1,4 @@
 from django.db.models import Count, Q, QuerySet
-from django.db.models import Q, QuerySet
 from django.contrib.auth import get_user_model
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
