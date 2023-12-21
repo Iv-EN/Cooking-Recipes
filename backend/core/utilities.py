@@ -1,9 +1,9 @@
 """Вспомогательные утилиты."""
-from django.conf import settings
 from datetime import datetime as dt
 from typing import TYPE_CHECKING
 from urllib.parse import unquote
 
+from django.conf import settings
 from django.db.models import F, Sum
 
 from recipes.models import AmountIngredient, Recipe
@@ -40,14 +40,14 @@ def create_shoping_list(user: 'CustomUser') -> str:
         .annotate(amount=Sum('amount'))
     )
     ingredients_list = (
-        f'{ingredient["ingredients__name"]}: {ingredient["amount"]}'
+        f'{ingredient["ingredients__name"]}: {ingredient["amount"]} '
         f'{ingredient["measurement"]}'
         for ingredient in ingredients
     )
     shopping_list.extend(ingredients_list)
     shopping_list.append(
         '\n Составлено в Foodgram.\n'
-        'Автор - студент 24 когорты Евгений Иванов.')
+        'Автор - студент 26 когорты Евгений Иванов.')
     return "\n".join(shopping_list)
 
 

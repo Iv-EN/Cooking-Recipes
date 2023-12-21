@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponse
 from djoser.views import UserViewSet as UserViewSetDjoser
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     DjangoModelPermissions, IsAuthenticated,
@@ -36,7 +37,6 @@ class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
     pagination_class = LimitPagePagination
     permission_classes = (DjangoModelPermissions,)
     add_serializer = UserSubscribeSerializer
-    link_model = Subscriptions
 
     @action(detail=True, permission_classes=(IsAuthenticated,))
     def subscribe(self, request: WSGIRequest, id: int | str) -> Response:
@@ -59,12 +59,21 @@ class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
     )
     def subscriptions(self, request: WSGIRequest) -> Response:
         """Список подписок пользователя."""
-        annotated_queryset = User.objects.filter(
-            subscribers__user=request.user
-        ).annotate(recipes_count=Count('recipes'))
-        pages = self.paginate_queryset(annotated_queryset)
-        serialiser = UserSubscribeSerializer(pages, many=True)
-        return self.get_paginated_response(serialiser.data)
+        try:
+            annotated_queryset = User.objects.filter(
+                subscribers__user=request.user
+            ).annotate(recipes_count=Count('recipes'))
+            pages = self.paginate_queryset(annotated_queryset)
+            serialiser = UserSubscribeSerializer(
+                pages,
+                many=True,
+                context={'request': request}
+            )
+            return self.get_paginated_response(serialiser.data)
+        except Exception as e:
+            return Response(
+                str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -116,13 +125,13 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
                 'is_in_shopping_cart')
             if is_in_cart in ('1', 'true'):
                 queryset = queryset.filter(in_basket__user=self.request.user)
-            elif is_in_cart in ('0', 'false'):
+            if is_in_cart in ('0', 'false'):
                 queryset = queryset.exclude(in_basket__user=self.request.user)
 
             is_favorite: str = self.request.query_params.get('is_favorited')
             if is_favorite in ('1', 'true'):
                 queryset = queryset.filter(in_favorite__user=self.request.user)
-            elif is_favorite in ('0', 'false'):
+            if is_favorite in ('0', 'false'):
                 queryset = queryset.exclude(
                     in_favorite__user=self.request.user)
 

@@ -69,14 +69,12 @@ class TagsValidator:
 
 
 class IngredientsValidator:
-    def __init__(self, ingredients, ingredient) -> None:
-        self.ingredients = ingredients
-        self.ingredient = ingredient
 
-    def validate(self,
-                 ingredients: list[dict[str, str | int]],
-                 ingredient_model: 'Ingredient',
-                 ) -> dict[int, tuple['Ingredient', int]]:
+    @staticmethod
+    def validate(
+        ingredients: list[dict[str, str | int]],
+        ingredient_model: 'Ingredient',
+    ) -> dict[int, tuple['Ingredient', int]]:
         """Проверка списка ингредиентов."""
         if not ingredients:
             raise ValidationError('Не указано ни одного ингредиента')

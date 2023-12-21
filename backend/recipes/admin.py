@@ -23,15 +23,9 @@ class IngredientRecipeInLine(TabularInline):
     extra = 2
 
 
-@register(AmountIngredient)
-class LinksAdmin(ModelAdmin):
-    pass
-
-
 @register(Ingredient)
 class IngredientAdmin(ModelAdmin):
     list_display = ('name', 'measurement_unit',)
-    list_filter = ('name',)
     search_fields = ('name',)
     save_on_top = True
 
@@ -46,7 +40,7 @@ class RecipeAdmin(ModelAdmin):
     )
     ram_id_fields = ('author',)
     list_filter = ('name', 'author__username', 'tags__name')
-    search_fields = ('name', 'author__username', 'tags__name',)
+    search_fields = ('name',)
     save_on_top = True
     inlines = (IngredientRecipeInLine,)
 
@@ -88,7 +82,7 @@ class TagAdmin(ModelAdmin):
 @register(Basket)
 class ShoppingCartAdmin(ModelAdmin):
     list_display = ('user', 'recipe', 'date_added')
-    search_fields = ('user__username', 'recipe__name')
+    search_fields = ('user', 'recipe')
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
@@ -108,7 +102,7 @@ class ShoppingCartAdmin(ModelAdmin):
 @register(Favorite)
 class FavoritesRecipesAdmin(ModelAdmin):
     list_display = ('user', 'recipe', 'date_added')
-    search_fields = ('user__username', 'recipe__name')
+    search_fields = ('user', 'recipe')
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(

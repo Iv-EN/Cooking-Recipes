@@ -5,9 +5,8 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, QuerySet
 from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import (
-    ModelSerializer, IntegerField, SerializerMethodField
-)
+from rest_framework.serializers import ModelSerializer, IntegerField, SerializerMethodField
+
 from core.validators import IngredientsValidator, TagsValidator
 from core.utilities import recipe_ingredients_set
 from recipes.models import Ingredient, Recipe, Tag
@@ -60,20 +59,33 @@ class UserSerializer(ModelSerializer):
 
 class UserSubscribeSerializer(UserSerializer):
     """Сериализатор вывода подписок текущего пользователя."""
-    recipes = RecipeShortSerializer(many=True, read_only=True)
-    recipes_count = IntegerField()
+
+    recipes = SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipes_count'
+            'is_subscribed', 'recipes',
         )
         read_only_fields = fields
 
     def get_is_subscribed(self, obj: User) -> bool:
         """Проверка наличия подписок."""
         return True
+
+    def get_recipes(self, obj):
+        """Получение списка рецептов автора."""
+        request = self.context.get('request')
+        recipe_limit = None
+        if request:
+            recipe_limit = request.query_params.get('recipes_limit')
+        recipes = obj.recipes.all()
+        if recipe_limit:
+            recipes = obj.recipes.all()[:int(recipe_limit)]
+        serializer = RecipeShortSerializer(
+            recipes, many=True, context=self.context)
+        return serializer.data
 
 
 class TagSerializer(ModelSerializer):
@@ -122,11 +134,12 @@ class RecipeSerialiser(ModelSerializer):
 
     def get_ingredients(self, recipe: Recipe) -> QuerySet[dict]:
         """Получение списка ингредиентов для рецепта."""
-        return recipe.ingredients.values(
+        ingredients = recipe.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F(
                 'ingredient_recipes__amount'
             )
         )
+        return ingredients
 
     def get_is_favorited(self, recipe: Recipe) -> bool:
         """Проверка нахождения рецепта в избранных."""
@@ -148,8 +161,7 @@ class RecipeSerialiser(ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if not tags_id or not ingredients:
             raise ValidationError('Не хватает данных')
-        tags_validator = TagsValidator(tags_id, Tag)
-        tags = tags_validator.validate()
+        tags = TagsValidator.validate(tags_id, Tag)
         ingredients = IngredientsValidator.validate(ingredients, Ingredient)
         data.update(
             {'tags': tags, 'ingredients': ingredients,
@@ -168,14 +180,14 @@ class RecipeSerialiser(ModelSerializer):
         return recipe
 
     @atomic
-    def update(self, instance: Recipe, validated_data: dict):
+    def update(self, intance: Recipe, validated_data: dict):
         """Изменение рецепта."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         if tags:
-            instance.tags.clear()
-            instance.tags.set(tags)
+            intance.tags.clear()
+            intance.tags.set(tags)
         if ingredients:
-            instance.ingredients.clear()
-            recipe_ingredients_set(instance, ingredients)
-        return super().update(instance, validated_data)
+            intance.ingredients.clear()
+            recipe_ingredients_set(intance, ingredients)
+        return super().update(intance, validated_data)
