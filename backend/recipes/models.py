@@ -194,7 +194,7 @@ class AmountIngredient(models.Model):
             ),
             MaxValueValidator(
                 settings.MAX_AMOUNT_INGREDIENTS,
-                message=f'Слишком много!'
+                message='Слишком много!'
             )
         ),
     )
