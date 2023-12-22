@@ -16,7 +16,7 @@ class Tag(models.Model):
     """Тэги для рецептов."""
 
     name = models.CharField(
-        verbose_name='Название',
+        verbose_name='Тэг',
         max_length=settings.MAX_LEN_RECIPES_CHARFIELD,
         validators=[ValidateName(field='Название тэга'),],
         unique=True

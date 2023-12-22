@@ -46,10 +46,6 @@ class SubscriptionsAdmin(ModelAdmin):
         'user__username',
         'author__username'
     )
-    list_filter = (
-        'user',
-        'author',
-    )
     empty_value_display = '-empty-'
 
     def get_queryset(self, request):

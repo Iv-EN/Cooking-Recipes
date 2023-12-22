@@ -22,13 +22,7 @@ class AddDelViewMixin:
         else:
             queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=obj_id)
-        try:
-            model(None, obj.pk, self.request.user.pk).save()
-        except IntegrityError:
-            return Response(
-                {'error': 'Действие уже выполнено.'},
-                status=HTTP_400_BAD_REQUEST,
-            )
+        model(None, obj.pk, self.request.user.pk).save()
         serializer: ModelSerializer = self.add_serializer(obj)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
