@@ -42,7 +42,7 @@ class UserSerializer(ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous or (user == obj):
             return False
-        return user.subscriptions.filter(author=obj).exists()
+        return user.subscriber.filter(author=obj).exists()
 
     def create(self, validated_data: dict) -> User:
         """Создание нового пользователя."""
@@ -80,9 +80,9 @@ class UserSubscribeSerializer(UserSerializer):
         recipe_limit = None
         if request:
             recipe_limit = request.query_params.get('recipes_limit')
-        recipes = obj.recipes.all()
+        recipes = obj.recipes.all().order_by('-pub_date')
         if recipe_limit:
-            recipes = obj.recipes.all()[:int(recipe_limit)]
+            recipes = recipes[:int(recipe_limit)]
         serializer = RecipeShortSerializer(
             recipes, many=True, context=self.context)
         return serializer.data

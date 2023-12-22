@@ -61,7 +61,7 @@ class UserViewSet(UserViewSetDjoser, AddDelViewMixin):
         """Список подписок пользователя."""
         try:
             annotated_queryset = User.objects.filter(
-                subscribers__user=request.user
+                following__user=request.user
             ).annotate(recipes_count=Count('recipes'))
             pages = self.paginate_queryset(annotated_queryset)
             serialiser = UserSubscribeSerializer(

@@ -1,14 +1,17 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (BaseApiRootView, IngredientViewSet, RecipeViewSet,
-                    TagViewSet, UserViewSet,)
+from .views import (
+    BaseApiRootView, IngredientViewSet, RecipeViewSet,
+    TagViewSet, UserViewSet,
+)
 
 app_name = 'api'
 
 
 class RuDefaultRouter(DefaultRouter):
-    '''Главная страница API на русском языке.'''
+    """Главная страница API на русском языке."""
+
     APIRootView = BaseApiRootView
 
 

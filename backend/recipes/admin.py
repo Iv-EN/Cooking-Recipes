@@ -82,7 +82,7 @@ class TagAdmin(ModelAdmin):
 @register(Basket)
 class ShoppingCartAdmin(ModelAdmin):
     list_display = ('user', 'recipe', 'date_added')
-    search_fields = ('user', 'recipe')
+    search_fields = ('user__username', 'recipe__name')
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
@@ -102,7 +102,7 @@ class ShoppingCartAdmin(ModelAdmin):
 @register(Favorite)
 class FavoritesRecipesAdmin(ModelAdmin):
     list_display = ('user', 'recipe', 'date_added')
-    search_fields = ('user', 'recipe')
+    search_fields = ('user__username', 'recipe__name')
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(

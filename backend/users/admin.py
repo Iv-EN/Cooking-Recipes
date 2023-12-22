@@ -9,24 +9,27 @@ class MyUserAdmin(UserAdmin):
     """Модель пользователей в админке."""
 
     list_display = (
-        'is_active',
         'username',
         'first_name',
         'last_name',
         'email',
-        'password',
+        'is_active',
+    )
+    list_display_links = (
+        'username',
+        'first_name',
+        'last_name',
+        'email',
     )
     fields = (
         ('is_active',),
-        ('password',),
         ('username',),
         ('email',),
         ('first_name',),
         ('last_name',),
     )
     fieldsets = []
-    search_fields = ('username', 'email')
-    list_filter = ('is_active', 'first_name', 'email',)
+    search_fields = ('username', 'email', 'first_name', 'last_name',)
     save_on_top = True
 
 
@@ -40,8 +43,8 @@ class SubscriptionsAdmin(ModelAdmin):
         'author',
     )
     search_fields = (
-        'user',
-        'author'
+        'user__username',
+        'author__username'
     )
     list_filter = (
         'user',
@@ -51,9 +54,3 @@ class SubscriptionsAdmin(ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'author')
-
-    def get_subscriber_username(self, obj):
-        return obj.user.username
-
-    def get_author_username(self, obj):
-        return obj.author.username
