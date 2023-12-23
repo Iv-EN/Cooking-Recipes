@@ -17,8 +17,6 @@ class MyUserAdmin(UserAdmin):
     )
     list_display_links = (
         'username',
-        'first_name',
-        'last_name',
         'email',
     )
     fields = (

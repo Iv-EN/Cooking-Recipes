@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, QuerySet
 from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import IntegerField, ModelSerializer, SerializerMethodField
 
 from core.validators import IngredientsValidator, TagsValidator
 from core.utilities import recipe_ingredients_set
@@ -61,12 +61,13 @@ class UserSubscribeSerializer(UserSerializer):
     """Сериализатор вывода подписок текущего пользователя."""
 
     recipes = SerializerMethodField()
+    recipes_count = IntegerField(read_only=True)
 
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes',
+            'is_subscribed', 'recipes', 'recipes_count',
         )
         read_only_fields = fields
 
@@ -86,6 +87,19 @@ class UserSubscribeSerializer(UserSerializer):
         serializer = RecipeShortSerializer(
             recipes, many=True, context=self.context)
         return serializer.data
+
+ #   def get_recipes_count(self, obj):
+  #      """Получение количества рецептов."""
+#        recipe_count_param = getattr(obj, 'recipes_count', 0)
+ #       request = self.context.get('request')
+  #      recipe_limit = 0
+#        if request:
+   #     recipe_limit_param = request.query_params.get('recipes_limit')
+#            if recipe_limit_param and recipe_limit_param.isdigit():
+    #    recipe_limit = int(recipe_limit_param)
+#        if recipe_limit > 0 and int(recipe_count) > recipe_limit:
+     #   return (recipe_count_param - recipe_limit + 1)
+#        return recipe_count
 
 
 class TagSerializer(ModelSerializer):
