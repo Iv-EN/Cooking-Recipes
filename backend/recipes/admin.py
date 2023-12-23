@@ -39,7 +39,7 @@ class RecipeAdmin(ModelAdmin):
         ('text', 'image'),
     )
     ram_id_fields = ('author',)
-    list_filter = ('name', 'author__username')
+    list_filter = ('author__username', 'tags__name')
     search_fields = ('name',)
     save_on_top = True
     inlines = (IngredientRecipeInLine,)
