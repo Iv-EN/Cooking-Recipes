@@ -1,14 +1,5 @@
-# FoodGram
+# Cooking-Recipes
 
-## https://mybestfoodgram.ddns.net
-- IP 84.201.161.161
-- Проект развёрнут по адресу https://mybestfoodgram.ddns.net.
-- Вход в админку по адресу:
-  ```
-  https://mybestfoodgram.ddns.net/admin/
-  ```
-  - E-mail: admin@admin.ru
-  - Password: admin
 
 ## Описание
 Здесь вы можете публиковать собственные рецепты, добавлять чужие рецепты в избранное, подписываться на других авторов и создавать список покупок для заданных блюд.
