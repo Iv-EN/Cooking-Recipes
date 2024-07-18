@@ -16,7 +16,7 @@
 ## Запуск приложения в контейнере локально:
 1. Загрузите проект
     ```bash
-    git clone git@github.com:Iv-EN/foodgram-project-react.git
+    git clone https://github.com/Iv-EN/Cooking-Recipes.git
     ```
 2. В папкe backend создайте файл `.env` со следующими переменными:
    ```
